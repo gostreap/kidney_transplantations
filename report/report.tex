@@ -4,6 +4,13 @@
 \usepackage[T1]{fontenc}
 \usepackage{babel}
 
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+\newcommand{\N}{\mathbb{N}}
+
 \newtheorem{lemm}{Lemma}
 
 \title{Matching mechanisms for kidney transplantations}
@@ -17,7 +24,46 @@
 
 \subsection*{Question 1}
 
+\begin{algorithm}[H]
+% \DontPrintSemicolon
+\caption{Direct Donation}
+
+\KwIn{A number $n$ of patient and, for all patients $i \in \N$, their set of compatible donors $K_i \subseteq [\![1, n]\!]$.}
+\KwOut{A set of pairs donor-patient pairs $c$ and a waiting list $w$.}
+\Begin{
+$c = \emptyset$\;
+$w = []$\;
+\For{$i = 1$ \KwTo $n$}{
+    \If{$i \in K_i$}{
+        $c = c \cup \{(i,i)\}$\; 
+    }
+    \Else{
+        $w$.add($i$)
+    }
+}
+\Return{$c$, $w$}}
+
+\end{algorithm}
+
+The implementation in python is pretty straightforward. The python function takes as parameter an integer $n$ and an integer set array of size $n$. The use of python set allows to test the if condition in constant times. The only difference with pseudo-code is the use of a list rather than a set for the variable c. This choice was made to avoid the unnecessary heaviness of the set data structure, but does not change the complexity.
+
 \subsection*{Question 2}
+\begin{algorithm}[H]
+    % \DontPrintSemicolon
+    \caption{Greedy Matching}
+    
+    \KwIn{A number $n$ of patient, a strict priority list of the patients U and, for all patients $i \in \N$, their set of compatible donors $K_i \subseteq [\![1, n]\!]$ and their strict preference relation $P_i$ over $K_i \cup \{k_i, w\}$. The priority list U starts with the patient with the highest priority and goes decreasingly to the lowest priority.}
+    \KwOut{A set of pairs donor-patient pairs $c$ and a waiting list $w$.}
+    \Begin{
+    $c = \emptyset$\;
+    $w = []$\;
+    $matched = []$\;
+    \For{$i = 1$ \KwTo $n$}{
+        matched.add(False)\;
+    }
+    \Return{$c$, $w$}}
+    
+    \end{algorithm}
 
 \section{Efficient stategy-proof exchange mechanism}
 

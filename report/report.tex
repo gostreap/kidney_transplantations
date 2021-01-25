@@ -12,17 +12,244 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 
+\setcounter{MaxMatrixCols}{20}
+
 \usepackage{tikz}
 \usetikzlibrary{calc}
 
 \usepackage{xcolor}
 
 \usepackage{subcaption}
-\usepackage{multicol}
 \usepackage{lipsum}
-\usepackage{wrapfig}
 
-\newcommand{\ruleAnext}{
+\newcommand{\ruleB}{
+    \begin{tikzpicture}[scale=5]
+
+        \coordinate (b) at (2.6, 0);
+        \coordinate (c) at (0,-2.6);
+        \coordinate (d) at (2.6,-2.6);
+        \coordinate (e) at (0,-5.2);
+        \coordinate (f) at (2.6,-5.2);
+
+
+        % \draw[->,>=latex, double] (1.15, 0) -- (1.45, 0);
+        % \draw[->,>=latex, double] ($(b) + (225:1.15)$) -- ($(c) + (45:1.15)$);
+        % \draw[->,>=latex, double] ($(c) + (0:1.15)$) -- ($(d) + (180:1.15)$);
+        % \draw[->,>=latex, double] ($(d) + (270:1.15)$) -- ($(e) + (45:1.15)$);
+        
+        \node[draw] at (0,-0.25) {Round 1};
+        \node[draw] at ($(b) + (0,-0.25)$) {Round 2};
+        \node[draw] at ($(c) + (0,-0.25)$) {Round 3};
+        \node[draw] at ($(d) + (0,-0.25)$) {Round 4};
+        \node[draw] at ($(e) + (0,-0.25)$) {Round 5};
+        \node[draw] at ($(f) + (0,-0.25)$) {Round 6};
+
+
+
+
+        % Figure 1
+        
+        \node[draw, circle, minimum size=26pt] (w) at (0:0) {$w$};
+        \node[draw, circle, minimum size=26pt] (t_1) at (60:1) {$t_1$};
+        \node[draw, circle, minimum size=26pt] (k_1) at (45:1) {$k_1$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_2) at (30:1) {$t_2$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_2) at (15:1) {$k_2$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_3) at (0:1) {$t_3$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_3) at (345:1) {$k_3$};
+        \node[draw, circle, minimum size=26pt] (t_4) at (330:1) {$t_4$};
+        \node[draw, circle, minimum size=26pt] (k_4) at (315:1) {$k_4$};
+        \node[draw, circle, minimum size=26pt] (t_5) at (300:1) {$t_5$};
+        \node[draw, circle, minimum size=26pt] (k_5) at (285:1) {$k_5$};
+        \node[draw, circle, minimum size=26pt] (t_6) at (270:1) {$t_6$};
+        \node[draw, circle, minimum size=26pt] (k_6) at (255:1) {$k_6$};
+        \node[draw, circle, minimum size=26pt] (t_7) at (240:1) {$t_7$};
+        \node[draw, circle, minimum size=26pt] (k_7) at (225:1) {$k_7$};
+        \node[draw, circle, minimum size=26pt] (t_8) at (210:1) {$t_8$};
+        \node[draw, circle, minimum size=26pt] (k_8) at (195:1) {$k_8$};
+        \node[draw, circle, minimum size=26pt] (t_9) at (180:1) {$t_9$};
+        \node[draw, circle, minimum size=26pt] (k_9) at (165:1) {$k_9$};
+        \node[draw, circle, minimum size=26pt] (t_10) at (150:1) {$t_{10}$};
+        \node[draw, circle, minimum size=26pt] (k_10) at (135:1) {$k_{10}$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_11) at (120:1) {$t_{11}$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_11) at (105:1) {$k_{11}$};
+        \node[draw, circle, minimum size=26pt] (t_12) at (90:1) {$t_{12}$};
+        \node[draw, circle, minimum size=26pt] (k_12) at (75:1) {$k_{12}$};
+    
+        \draw[->,>=latex] (k_1) -- (t_1);
+        \draw[->,>=latex, red, thick] (k_2) -- (t_2);
+        \draw[->,>=latex, red, thick] (k_3) -- (t_3);
+        \draw[->,>=latex] (k_4) -- (t_4);
+        \draw[->,>=latex] (k_5) -- (t_5);
+        \draw[->,>=latex] (k_6) -- (t_6);
+        \draw[->,>=latex] (k_7) -- (t_7);
+        \draw[->,>=latex] (k_8) -- (t_8);
+        \draw[->,>=latex] (k_9) -- (t_9);
+        \draw[->,>=latex] (k_10) -- (t_10);
+        \draw[->,>=latex, red, thick] (k_11) -- (t_11);
+        \draw[->,>=latex] (k_12) -- (t_12);
+    
+        \draw[->,>=latex] (t_1) [out=120, in=110] to (k_9);
+        \draw[->,>=latex, red, thick] (t_2) to (k_11);
+        \draw[->,>=latex, red, thick] (t_3) to (k_2);
+        \draw[->,>=latex] (t_4) [out=200, in=60] to (k_5);
+        \draw[->,>=latex] (t_5) [out=355, in = 285] to (k_3);
+        \draw[->,>=latex] (t_6) to (k_3);
+        \draw[->,>=latex] (t_7) to (k_6);
+        \draw[->,>=latex] (t_8) [out=340, in=120] to (k_6);
+        \draw[->,>=latex] (t_9) to (k_3);
+        \draw[->,>=latex] (t_10) [out=90, in=165] to (k_11);
+        \draw[->,>=latex, red, thick] (t_11) to (k_3);
+        \draw[->,>=latex] (t_12) to (k_11);
+
+        % Figure 2
+
+        \node[draw, circle, minimum size=26pt] (w) at ($(b) + (0:0)$) {$w$};
+        \node[draw, circle, minimum size=26pt] (t_1) at ($(b) + (60:1)$) {$t_1$};
+        \node[draw, circle, minimum size=26pt] (k_1) at ($(b) + (45:1)$) {$k_1$};
+        \node[draw, circle, minimum size=26pt] (t_4) at ($(b) + (330:1)$) {$t_4$};
+        \node[draw, circle, minimum size=26pt] (k_4) at ($(b) + (315:1)$) {$k_4$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_5) at ($(b) + (300:1)$) {$t_5$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_5) at ($(b) + (285:1)$) {$k_5$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_6) at ($(b) + (270:1)$) {$t_6$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_6) at ($(b) + (255:1)$) {$k_6$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_7) at ($(b) + (240:1)$) {$t_7$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_7) at ($(b) + (225:1)$) {$k_7$};
+        \node[draw, circle, minimum size=26pt] (t_8) at ($(b) + (210:1)$) {$t_8$};
+        \node[draw, circle, minimum size=26pt] (k_8) at ($(b) + (195:1)$) {$k_8$};
+        \node[draw, circle, minimum size=26pt] (t_9) at ($(b) + (180:1)$) {$t_9$};
+        \node[draw, circle, minimum size=26pt] (k_9) at ($(b) + (165:1)$) {$k_9$};
+        \node[draw, circle, minimum size=26pt] (t_10) at ($(b) + (150:1)$) {$t_{10}$};
+        \node[draw, circle, minimum size=26pt] (k_10) at ($(b) + (135:1)$) {$k_{10}$};
+        \node[draw, circle, minimum size=26pt] (t_12) at ($(b) + (90:1)$) {$t_{12}$};
+        \node[draw, circle, minimum size=26pt] (k_12) at ($(b) + (75:1)$) {$k_{12}$};
+    
+        \draw[->,>=latex] (k_1) -- (t_1);
+        \draw[->,>=latex] (k_4) -- (t_4);
+        \draw[->,>=latex, red, thick] (k_5) -- (t_5);
+        \draw[->,>=latex, red, thick] (k_6) -- (t_6);
+        \draw[->,>=latex, red, thick] (k_7) -- (t_7);
+        \draw[->,>=latex] (k_8) -- (t_8);
+        \draw[->,>=latex] (k_9) -- (t_9);
+        \draw[->,>=latex] (k_10) -- (t_10);
+        \draw[->,>=latex] (k_12) -- (t_12);
+    
+        \draw[->,>=latex] (t_1) to (k_9);
+        \draw[->,>=latex] (t_4) [out=180, in=70] to (k_5);
+        \draw[->,>=latex, red, thick] (t_5) [out=240, in=280] to (k_7);
+        \draw[->,>=latex, red, thick] (t_6) to (k_5);
+        \draw[->,>=latex, red, thick] (t_7) to (k_6);
+        \draw[->,>=latex] (t_8) [out=345, in=120] to (k_6);
+        \draw[->,>=latex] (t_9) to (w);
+        \draw[->,>=latex] (t_10) [out=90, in=105] to (k_1);
+        \draw[->,>=latex] (t_12) to (k_9);
+        
+        % Figure 3
+
+        \node[draw, circle, minimum size=26pt] (w) at ($(c) + (0:0)$) {$w$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_1) at ($(c) + (60:1)$) {$t_1$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_1) at ($(c) + (45:1)$) {$k_1$};
+        \node[draw, circle, minimum size=26pt] (t_4) at ($(c) + (330:1)$) {$t_4$};
+        \node[draw, circle, minimum size=26pt] (k_4) at ($(c) + (315:1)$) {$k_4$};
+        \node[draw, circle, minimum size=26pt] (t_8) at ($(c) + (210:1)$) {$t_8$};
+        \node[draw, circle, minimum size=26pt] (k_8) at ($(c) + (195:1)$) {$k_8$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_9) at ($(c) + (180:1)$) {$t_9$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_9) at ($(c) + (165:1)$) {$k_9$};
+        \node[draw, circle, minimum size=26pt] (t_10) at ($(c) + (150:1)$) {$t_{10}$};
+        \node[draw, circle, minimum size=26pt] (k_10) at ($(c) + (135:1)$) {$k_{10}$};
+        \node[draw, circle, minimum size=26pt] (t_12) at ($(c) + (90:1)$) {$t_{12}$};
+        \node[draw, circle, minimum size=26pt] (k_12) at ($(c) + (75:1)$) {$k_{12}$};
+    
+        \draw[->,>=latex, red, thick] (k_1) -- (t_1);
+        \draw[->,>=latex] (k_4) -- (t_4);
+        \draw[->,>=latex] (k_8) -- (t_8);
+        \draw[->,>=latex, red, thick] (k_9) -- (t_9);
+        \draw[->,>=latex] (k_10) -- (t_10);
+        \draw[->,>=latex] (k_12) -- (t_12);
+    
+        \draw[->,>=latex, red, thick] (t_1) to (k_9);
+        \draw[->,>=latex] (t_4) [out=125, in=0] to (k_9);
+        \draw[->,>=latex] (t_8) to (k_4);
+        \draw[->,>=latex, red, thick] (t_9) to (w);
+        \draw[->,>=latex] (t_10) [out=90, in=105] to (k_1);
+        \draw[->,>=latex] (t_12) to (k_9);
+
+        % Figure 4
+    
+        \node[draw, circle, minimum size=26pt] (w) at ($(d) + (0:0)$) {$w$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (t_1) at ($(d) + (60:1)$) {$t_1$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (k_1) at ($(d) + (45:1)$) {$k_1$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_4) at ($(d) + (330:1)$) {$t_4$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_4) at ($(d) + (315:1)$) {$k_4$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_8) at ($(d) + (210:1)$) {$t_8$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_8) at ($(d) + (195:1)$) {$k_8$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (t_9) at ($(d) + (180:1)$) {$t_9$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (k_9) at ($(d) + (165:1)$) {$k_9$};
+        \node[draw, circle, minimum size=26pt] (t_10) at ($(d) + (150:1)$) {$t_{10}$};
+        \node[draw, circle, minimum size=26pt] (k_10) at ($(d) + (135:1)$) {$k_{10}$};
+        \node[draw, circle, minimum size=26pt] (t_12) at ($(d) + (90:1)$) {$t_{12}$};
+        \node[draw, circle, minimum size=26pt] (k_12) at ($(d) + (75:1)$) {$k_{12}$};
+    
+        \draw[->,>=latex, blue, thick] (k_1) -- (t_1);
+        \draw[->,>=latex, red, thick] (k_4) -- (t_4);
+        \draw[->,>=latex, red, thick] (k_8) -- (t_8);
+        \draw[->,>=latex, blue, thick] (k_9) -- (t_9);
+        \draw[->,>=latex] (k_10) -- (t_10);
+        \draw[->,>=latex] (k_12) -- (t_12);
+    
+        \draw[->,>=latex, blue, thick] (t_1) to (k_9);
+        \draw[->,>=latex, red, thick] (t_4) to (k_8);
+        \draw[->,>=latex, red, thick] (t_8) to (k_4);
+        \draw[->,>=latex, blue, thick] (t_9) to (w);
+        \draw[->,>=latex] (t_10) [out=90, in=105] to (k_1);
+        \draw[->,>=latex] (t_12) to (k_8);
+        
+        % figure 5
+
+        \node[draw, circle, minimum size=26pt] (w) at ($(e) + (0:0)$) {$w$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (t_1) at ($(e) + (60:1)$) {$t_1$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (k_1) at ($(e) + (45:1)$) {$k_1$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (t_9) at ($(e) + (180:1)$) {$t_9$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (k_9) at ($(e) + (165:1)$) {$k_9$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_10) at ($(e) + (150:1)$) {$t_{10}$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_10) at ($(e) + (135:1)$) {$k_{10}$};
+        \node[draw, circle, minimum size=26pt] (t_12) at ($(e) + (90:1)$) {$t_{12}$};
+        \node[draw, circle, minimum size=26pt] (k_12) at ($(e) + (75:1)$) {$k_{12}$};
+    
+        \draw[->,>=latex, blue, thick] (k_1) -- (t_1);
+        \draw[->,>=latex, blue, thick] (k_9) -- (t_9);
+        \draw[->,>=latex, red, thick] (k_10) -- (t_10);
+        \draw[->,>=latex] (k_12) -- (t_12);
+    
+        \draw[->,>=latex, blue, thick] (t_1) to (k_9);
+        \draw[->,>=latex, blue, thick] (t_9) to (w);
+        \draw[->,>=latex, red, thick] (t_10) [out=90, in=105] to (k_1);
+        \draw[->,>=latex] (t_12) to (k_10);
+
+        % figure 6
+
+        \node[draw, circle, minimum size=26pt] (w) at ($(f) + (0:0)$) {$w$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (t_1) at ($(f) + (60:1)$) {$t_1$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (k_1) at ($(f) + (45:1)$) {$k_1$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (t_9) at ($(f) + (180:1)$) {$t_9$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (k_9) at ($(f) + (165:1)$) {$k_9$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (t_10) at ($(f) + (150:1)$) {$t_{10}$};
+        \node[draw, circle, minimum size=26pt, blue, thick] (k_10) at ($(f) + (135:1)$) {$k_{10}$};
+        \node[draw, circle, minimum size=26pt, red, thick] (t_12) at ($(f) + (90:1)$) {$t_{12}$};
+        \node[draw, circle, minimum size=26pt, red, thick] (k_12) at ($(f) + (75:1)$) {$k_{12}$};
+    
+        \draw[->,>=latex, blue, thick] (k_1) -- (t_1);
+        \draw[->,>=latex, blue, thick] (k_9) -- (t_9);
+        \draw[->,>=latex, blue, thick] (k_10) -- (t_10);
+        \draw[->,>=latex, red, thick] (k_12) -- (t_12);
+    
+        \draw[->,>=latex, blue, thick] (t_1) to (k_9);
+        \draw[->,>=latex, blue, thick] (t_9) to (w);
+        \draw[->,>=latex, blue, thick] (t_10) [out=90, in=105] to (k_1);
+        \draw[->,>=latex, red, thick] (t_12) to (k_10);
+    \end{tikzpicture}
+}
+
+\newcommand{\ruleA}{
     \begin{tikzpicture}[scale=5]
 
         \coordinate (b) at (2.6, 0);
@@ -326,20 +553,55 @@ Thus either there exists a cycle, or each pair is the tail of some $w$-chain.
 
 \subsection*{Question 5}
 
-Let's run the Cycles and Chains Matching Algorithm with rule A on this example. The initial state of the graph, before the first round, is shown in figure 1.
+Let's run the Cycles and Chains Matching Algorithm with rule A on this example. Graphs associated with every round are shown in figure \ref{fig:ruleA}.
 
 The initial graph contains a cycle $C_1 = (k_3, t_3, k_2, t_2, k_{11}, t_{11})$. The first round of the algorithm therefore consists in detecting this cycle, allocating the kidneys to the patients and then eliminating the cycle.
 
-\lipsum[1-2]
+After removing the first circle, a new circle $C_2 = (k_5, t_5, k_7, t_7, k_6, t_6)$ is formed. In the second round, this cycle is therefore deleted.
 
-% \ruleAfive
+At the start of the third round, there is no more circle. The graph contains 2 $w$-chains of length 6 : $W_1 = (k_8, t_8, k_4, t_4, k_9, t_9)$ and $W_2 = (k_{10}, t_{10}, k_1, t_1, k_9, t_9)$. There are no longer $w$-chains and since the highest priority patient $ t_1 $ is only present in $W_2$,  $W_2$ is chosen. The kidneys are allocated and the chain remains in the graph for the next round but patients pointing to other kidneys than $k_10$ in the chain are redirected.
+
+After the redirect, a new circle $ C_3 = (k_4, t_4, k_8, t_8)$ has formed. The fourth round therefore consists in the elimination of this cycle.
+
+There is no new circle and the patient $ t_{12} $ now points to $ k_{10} $ forming a chain of maximum length $ W_3 = (k_{12}, t_{12}, k_{10}, t_{10}, k_1, t_1, k_9, t_9) $. Round 5 assigns kidneys $ k_{10} $ to patient $ t_{12} $ and there are no more patients with no kidneys. The algorithm stops.
+
+The final matching is:
+\begin{equation*}
+\left(
+\begin{matrix}
+    t_1 & t_2 & t_3 & t_4 & t_5 & t_6 & t_7 & t_8 & t_9 & t_{10} & t_{11} & t_{12} \\
+    k_9 & k_{11} & k_2 & k_8 & k_7 & k_5 & k_6 & k_4 & w & k_1 & k_3 & k_{10}
+\end{matrix}
+\right)
+\end{equation*}
 
 \newpage
 
-\begin{figure}
+\begin{figure}[!ht]
     \centering
-    \scalebox{0.45}{\ruleAnext}
-    \caption{Test}
+    \scalebox{0.5}{\ruleA}
+    \caption{State of the graph at every round.}
+    \label{fig:ruleA}
+\end{figure}
+
+\newpage 
+\subsection*{Question 6}
+
+If the selection rule keep in the procedure any selected $w$-chain at a non-terminal round, then every unasigned kidney is available at every round of the procedure. Therefore, at every round of the algorithm, a patient can only be assigned to his best choice among remaining kidneys. The only way to give him a better kidney is to take it back from a patient whose assignement occurs in a previous round. Since this patient had his best choice at the time, he will strictly disprefer the new matching. Thus, the exchange mechanism is efficient.
+
+\subsection*{Question 7}
+
+If we swap $k_8$ and $k_9$ in the order of preference of the twelfth patient, then in round 3 the longest $w$-chain becomes $(k_{12}, t_{12}, k_8, t_8, k_4, t_4, k_9, t_9)$ and $t_{12}$ is assigned to $k_8$, which he strictly prefers to $k_{10}$, that he would get by being honest about his preferences. Therefore the exchange mechanism with chain selection rule A is not strategy-proof.
+
+\subsection*{Question 8}
+
+\newpage
+
+\begin{figure}[!ht]
+    \centering
+    \scalebox{0.5}{\ruleB}
+    \caption{State of the graph at every round.}
+    \label{fig:ruleB}
 \end{figure}
 
 

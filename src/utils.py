@@ -33,11 +33,11 @@ def generate_data(n):
         list_of_kidneys = sample(rg, randint(1, n))
         K.append(set(list_of_kidneys))
         if i in K[i]:
-            P.append(sample(list_of_kidneys+["w"], len(list_of_kidneys) + 1))
+            P.append(sample(list_of_kidneys + ["w"], len(list_of_kidneys) + 1))
             id_i = P[i].index(i)
             P[i][0], P[i][id_i] = P[i][id_i], P[i][0]
         else:
-            P.append(sample(list_of_kidneys+[i, "w"], len(list_of_kidneys) + 2))
+            P.append(sample(list_of_kidneys + [i, "w"], len(list_of_kidneys) + 2))
     return n, K, P, U
 
 
@@ -58,3 +58,13 @@ def get_graph_from_K(n, K):
                 g.add_edges([(i, j)])
 
     return g
+
+
+def matrix_to_adjacency_list(M):
+    lists = []
+    for i, row in enumerate(M):
+        lists.append([])
+        for j, c in enumerate(row):
+            if c == 1:
+                lists[i].append(j)
+    return lists

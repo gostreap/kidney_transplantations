@@ -1,4 +1,4 @@
-from igraph import plot
+from jgraph import plot
 
 def greedy_matching(n, K, P, U):
     c, w = [], []

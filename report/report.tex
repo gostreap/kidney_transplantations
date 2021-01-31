@@ -691,7 +691,7 @@ In order to list all the minimal infeasible paths, we will simply use a recursiv
         $inpath = inpath \setminus \{v\}$\;
         \Return{paths}\;
     }
-  \end{algorithm}
+\end{algorithm}
 
 The implementation in python is very similar to the pseudo-code, except that the algorithm returns a list of paths rather than a set. The graph is given in the form of adjacency lists, in order to be able to iterate quickly on the neighbors.
 
@@ -701,11 +701,11 @@ The implementation in python is very similar to the pseudo-code, except that the
         \hline
         file & CPU time & $|V|$ & $|E|$ & number of paths \\
         \hline
-        test2.txt & $0.071 * 10^{-3}$ seconds & 12 & 18 & 36 \\
-        test3.txt & $0.232 * 10^{-3}$ seconds & 17 & 229 & 238 \\
+        test2.txt & $0.097 * 10^{-3}$ seconds & 12 & 18 & 45 \\
+        test3.txt & $31.008 * 10^{-3}$ seconds & 17 & 229 & 28188 \\
         \hline
     \end{tabular}
-    \caption{Execution time on an Intel i7-3770k processor for two test files.}
+    \caption{Mean execution time over 1000 iterations on an Intel i5-6200U processor.}
 \end{figure}
 
 \subsection*{Question 10}
@@ -739,5 +739,42 @@ Finally, we need to verify that there is no exchange cycle of length more than t
 Our integer linear program is therefore the maximization of \ref{obj_func} subject to \ref{cons1}, \ref{cons2}, \ref{cons3}, \ref{cons4} and \ref{cons5}.
 
 \subsection*{Question 11}
+
+\begin{algorithm}
+    \SetKwFunction{Faux}{Aux}
+    \SetKwProg{Fn}{Function}{:}{}
+
+    \caption{Branch and Bound}
+    
+    \KwIn{$G = (V, E)$ a graph and $k$ the threshold.}
+    \KwOut{The set of all minimal infeasible paths.}
+
+    \Begin{
+        $paths = \emptyset$\;
+        \For{$v \in V$}{
+            $paths = paths \cup \{\Faux(G, v, k, \emptyset)\}$\;
+        }
+        \Return{paths}\;
+    }
+
+    \tcc{Return the list of all minimal infeasible path starting from $v$}
+    
+    \Fn{\Faux{G, v, k, inpath}}{
+        $inpath = inpath \cup \{v\}$\;
+        \If{$k = 0$}{
+            \Return{$\{[v]\}$}\;
+        }
+        $paths = \emptyset$\;
+        \For{$neighbour \in v.neighbours$}{
+            \If{$neighbour \notin inpath$}{
+                \For{$path \in \Faux(G, neighbour, k-1, inpath)$}{
+                    $paths = paths \cup \{path.add\_first(v)\}$\;
+                }
+            }
+        }
+        $inpath = inpath \setminus \{v\}$\;
+        \Return{paths}\;
+    }
+\end{algorithm}
 
 \end{document}

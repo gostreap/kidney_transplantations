@@ -1,5 +1,5 @@
 from utils import generate_data, get_graph_from_K
-from igraph import plot
+from jgraph import plot
 
 
 def greedy_matching(n, K, P, U):

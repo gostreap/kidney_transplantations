@@ -1,5 +1,4 @@
 from random import randint, sample
-from igraph import Graph
 
 
 def loadtxt(path):
@@ -14,7 +13,7 @@ def loadtxt(path):
     M = []
     for i in range(n):
         M.append([])
-        M[i] = list(map(float, lines[i + 2].strip().split("   ")))
+        M[i] = list(map(int, map(float, lines[i + 2].strip().split("   "))))
 
     return n, K, M
 
@@ -40,24 +39,6 @@ def generate_data(n):
             P.append(sample(list_of_kidneys + [i, "w"], len(list_of_kidneys) + 2))
     return n, K, P, U
 
-
-def get_graph_from_K(n, K):
-    """
-    Return a graph as defined in 3.2
-    """
-    g = Graph()
-    g.layout("sphere")
-    g.add_vertices(n)
-
-    for i in range(n):
-        g.vs[i]["label"] = str(i)
-
-    for i in range(n):
-        for j in K[i]:
-            if i in K[j]:
-                g.add_edges([(i, j)])
-
-    return g
 
 
 def matrix_to_adjacency_list(M):

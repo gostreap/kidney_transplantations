@@ -1,4 +1,6 @@
 from random import randint, sample
+import networkx as nx
+from networkx.drawing.nx_agraph import to_agraph
 
 
 def loadtxt(path):
@@ -40,7 +42,6 @@ def generate_data(n):
     return n, K, P, U
 
 
-
 def matrix_to_adjacency_list(M):
     lists = []
     for i, row in enumerate(M):
@@ -49,3 +50,17 @@ def matrix_to_adjacency_list(M):
             if c == 1:
                 lists[i].append(j)
     return lists
+
+
+def display_solution(M, solution, file="graph.png"):
+    g = nx.from_numpy_matrix(np.array(M), create_using=nx.DiGraph)
+
+    for u,v in g.edges():
+        if solution[u][v] == 1:
+            g[u][v]['color']='red'
+        else:
+            g[u][v]['color']='black'
+
+    G = to_agraph(g) 
+    G.layout('dot')                                                                 
+    G.draw(file)

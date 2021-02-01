@@ -1,5 +1,4 @@
-from utils import generate_data, get_graph_from_K
-from jgraph import plot
+from utils import generate_data
 
 
 def direct_donation(n, K):
@@ -19,8 +18,6 @@ def run_random(n):
     n, K, _, _ = generate_data(n)
     for i in range(n):
         print(i, "->", K[i])
-    g = get_graph_from_K(n, K)
-    plot(g)
     return direct_donation(n, K)
 
 

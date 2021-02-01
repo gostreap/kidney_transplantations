@@ -113,7 +113,7 @@ def solve(n, k, M):
 
 def solve_file(file):
     n, k, M = loadtxt(file)
-    solve(n, k, M)
+    return solve(n, k, M)
 
 
 # solve_file("dataset/data1.txt")

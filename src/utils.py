@@ -50,17 +50,3 @@ def matrix_to_adjacency_list(M):
             if c == 1:
                 lists[i].append(j)
     return lists
-
-
-def display_solution(M, solution, file="graph.png"):
-    g = nx.from_numpy_matrix(np.array(M), create_using=nx.DiGraph)
-
-    for u,v in g.edges():
-        if solution[u][v] == 1:
-            g[u][v]['color']='red'
-        else:
-            g[u][v]['color']='black'
-
-    G = to_agraph(g) 
-    G.layout('dot')                                                                 
-    G.draw(file)

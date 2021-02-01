@@ -1,6 +1,7 @@
 import numpy as np
+import os
 
-from ilp import get_variables, get_obj_func, get_constraints, get_solution, is_integer_solution
+from ilp import get_variables, get_obj_func, get_constraints, get_solution, is_integer_solution, solve_file
 from minimal_infeasible_paths import minimal_infeasible_path
 from pulp import LpMaximize, LpProblem, LpStatus, lpSum, LpVariable
 from utils import loadtxt, matrix_to_adjacency_list
@@ -25,7 +26,7 @@ def pulp_solve(n, k, M):
 
 def pulp_solve_file(file):
     n, k, M = loadtxt(file)
-    pulp_solve(n, k, M)
+    return pulp_solve(n, k, M)
 
 
 def is_problem_solution_integer(n, k, M):
@@ -55,7 +56,32 @@ def write_problem(file, n, k, M):
         f.write("\n")
 
 
+def write_solution(file, solution):
+    f = open(file, "w")
+    for i in range(len(solution)):
+        for j in range(len(solution)):
+            f.write("   {}".format(solution[i][j]))
+        f.write("\n")
+
+
+def write_solution_png(M, solution, file="graph.png"):
+    g = nx.from_numpy_matrix(np.array(M), create_using=nx.DiGraph)
+
+    for u,v in g.edges():
+        if solution[u][v] == 1:
+            g[u][v]['color']='red'
+        else:
+            g[u][v]['color']='black'
+
+    G = to_agraph(g) 
+    G.layout('dot')                                                                 
+    G.draw(file)
+
+
 def generate_problem(n, k, n_dataset):
+    """
+    Generates problems for which the optimal solution in linear programming is not only integer.
+    """
     i = 0
     while i != n_dataset:
         M = np.random.randint(2, size=(n,n))
@@ -63,3 +89,17 @@ def generate_problem(n, k, n_dataset):
             i += 1
             write_problem("dataset/non_integer_lp_solution_{}_{}_number_{}".format(n, k, i), n, k, M)
 
+
+def test_solve_file(file):
+    best1, _ = pulp_solve_file(file)
+    best2, _ = solve_file(file)
+    return round(best1) == round(best2)
+
+def test_solve():
+    res = []
+    for file in os.listdir("dataset/"):
+        if file.startswith("non_integer_lp_solution_5"):
+            res.append(test_solve_file("dataset/" + file))
+    print("Correct :", res.count(True), "- Incorrect :", res.count(False))
+
+test_solve()

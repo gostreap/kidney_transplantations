@@ -112,4 +112,5 @@ def test_solve():
             res.append(test_solve_file("dataset/" + file))
     print("Correct :", res.count(True), "- Incorrect :", res.count(False))
 
-solve_and_write_solution("dataset/non_integer_lp_solution_5_3_number_3", "solution/non_integer_lp_solution_5_3_number_3")
+solve_and_write_solution("dataset/test2.txt", "solution/test2")
+solve_and_write_solution("dataset/test3.txt", "solution/test3")

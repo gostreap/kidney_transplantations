@@ -610,50 +610,6 @@ If we swap $k_8$ and $k_9$ in the order of preference of the twelfth patient, th
 
 \subsection*{Question 9}
 
-% \begin{algorithm}[H]
-%     % \DontPrintSemicolon
-%     \caption{Greedy Matching}
-    
-%     \KwIn{$G = (V, E)$ a graph and $k$ the threshold.}
-%     \KwOut{The list of all minimal infeasible paths.}
-
-%     \Init{
-%     %\tcc{Initialize arrays}
-%     \For{$i = 1$ \KwTo $n$}{
-%         is\_matched[i] = False\;
-%         %\tcc{The sort function returns a list of the elements of $K\_i$ sorted in descending order according to the preference relation $P\_i$.}
-%         sorted\_K[i] = sort($K_i$, $P_i$) \tcp*{\textcolor{red}{$\mathcal{O}(n\log(n))$}}
-%     }
-%     }
-
-%     \Begin{
-    
-%     \tcc{Iterate over all patient by decreasing priority}
-%     \For{\KwNot $U.is\_empty()$}{
-%         u = U.pop()\;
-%         \If{\KwNot $is\_matched[u]$}{
-%             \While{\KwNot $sorted\_K[u].is\_empty()$}{
-%                 v = sorted\_K[u].pop()\;
-%                 \If{\KwNot $is\_matched[v]$}{
-%                     \tcc{If $t_v$ prefer $k_u$ over $k_v$ and $w$}
-%                     \If{$t_v \, P_v \, t_u$ \KwAnd $t_v \, P_v \, w$}{
-%                         $M = M \cup \{((k_u, t_u), (k_v, t_v))\}$\;
-%                         is\_matched[u] = True\;
-%                         is\_matched[v] = True\;
-%                     }
-%                 }
-%             }
-%         }
-%     }
-    
-%     }
-
-%     \SetAlgoLined
-%     \SetKwProg{Fn}{Function}{ is}{end}
-%     \Fn{afunc(i: int) : int}{return 0\;}
-    
-% \end{algorithm}
-
 In order to list all the minimal infeasible paths, we will simply use a recursive function \texttt{Aux} which, given a graph $G$, a vertex $v$ and an integer $k$, returns all the paths of lengths $k+1$ starting at $v$. In order to avoid cycles, we add an $inpath$ variable, a set containing the vertices already in the current path. Finally, we called this function on all the vertices of the graph.
 
 \begin{algorithm}
@@ -676,10 +632,10 @@ In order to list all the minimal infeasible paths, we will simply use a recursiv
     \tcc{Return the list of all minimal infeasible path starting from $v$}
     
     \Fn{\Faux{G, v, k, inpath}}{
-        $inpath = inpath \cup \{v\}$\;
         \If{$k = 0$}{
             \Return{$\{[v]\}$}\;
         }
+        $inpath = inpath \cup \{v\}$\;
         $paths = \emptyset$\;
         \For{$neighbour \in v.neighbours$}{
             \If{$neighbour \notin inpath$}{
@@ -740,41 +696,84 @@ Our integer linear program is therefore the maximization of \ref{obj_func} subje
 
 \subsection*{Question 11}
 
+The relaxed problem is the same as before with constraint \ref{cons1} replaced by a new constraint:
+\begin{equation}\label{cons6}
+    \forall (i, j) \in {[\![1, n]\!]}^2, \; 0 \leq a_{i,j} \leq 1
+\end{equation}
+In the following algorithm, we assume given a function allowing to solve a linear program and returning the solution and the value of the objective function. If the problem is infeasible, the value of the objective function will be $ - \infty $. We also assume given a function that test if the solution is an integer one. 
+
+At each node of the tree, we will force a variable $ a_{i, j} $ to take the value 0 on one branch and 1 on the other by adding the constraints $ a_{i, j} \leq 0 $ and $ a_{i, j} \geq 1 $, then we'll take the best solution of the two branches.
 \begin{algorithm}
-    \SetKwFunction{Faux}{Aux}
+    \SetKwFunction{Faux}{BranchAndBound}
+    \SetKwFunction{IsInt}{IsIntegerSolution}
     \SetKwProg{Fn}{Function}{:}{}
 
     \caption{Branch and Bound}
     
-    \KwIn{$G = (V, E)$ a graph and $k$ the threshold.}
-    \KwOut{The set of all minimal infeasible paths.}
+    \KwIn{A linear problem $prob$ and a set of relaxed variables $vars$}
+    \KwOut{A solution to the problem}
 
     \Begin{
-        $paths = \emptyset$\;
-        \For{$v \in V$}{
-            $paths = paths \cup \{\Faux(G, v, k, \emptyset)\}$\;
-        }
-        \Return{paths}\;
+        \Return{\Faux{prob, vars, 0, $\emptyset$}}
     }
 
-    \tcc{Return the list of all minimal infeasible path starting from $v$}
+    % \tcc{Return the list of all minimal infeasible path starting from $v$}
     
-    \Fn{\Faux{G, v, k, inpath}}{
-        $inpath = inpath \cup \{v\}$\;
-        \If{$k = 0$}{
-            \Return{$\{[v]\}$}\;
+    \Fn{\Faux{prob, vars, best, solution}}{
+        score, new\_sol = prob.solve()\;
+        \If{$score = -\infty$}{
+            \Return{best, solution}\;
         }
-        $paths = \emptyset$\;
-        \For{$neighbour \in v.neighbours$}{
-            \If{$neighbour \notin inpath$}{
-                \For{$path \in \Faux(G, neighbour, k-1, inpath)$}{
-                    $paths = paths \cup \{path.add\_first(v)\}$\;
-                }
+        \ElseIf{$score < best$}{
+            \Return{best, solution}\;
+        }
+        \ElseIf{\IsInt{new\_solution}}{
+            \Return{score, new\_sol}\;
+        }
+        \Else{
+            x = vars.pop()\;
+            prob.add\_constraint($x \geq 1$)\;
+            $score_1$, $new\_sol_1$ = \Faux{prob, vars, best, solution}\;
+            prob.remove\_constraint($x \geq 1$)\;
+            prob.add\_constraint($x \leq 0$)\;
+            $score_2$, $new\_sol_2$ = \Faux{prob, vars, best, solution}\;
+            prob.remove\_constraint($x \leq 0$)\;
+            vars.add(x)\;
+            \If{$score_1 > score_2$}{
+                \Return{$score_1$, $new\_sol_1$}\;
             }
+            \Else{
+                \Return{$score_2$, $new\_sol_2$}\;
+            }
+
         }
-        $inpath = inpath \setminus \{v\}$\;
-        \Return{paths}\;
     }
 \end{algorithm}
+
+For the implementation, we used the Python \texttt{Pulp} library as the linear program solver. Unfortunately, it is not possible to simply remove a constraint from a linear problem with this library. Instead of the problem, we therefore pass the variables, the objective function and the list of constraints to each recursive call and we recreate the problem each time. Other than that, the implementation is very similar to pseudo-code.
+
+\subsection*{Question 12}
+
+The results of the previous algorithm are available in the following figure. Note that the execution time is very good because, in both cases, the relaxed problem directly gives an entire solution. The Branch-and-Bound algorithm is therefore unnecessary for the cases below. However, there are cases where the linear program does not give integer solutions. The code provided with the report contains functions capable of generating such cases.
+
+\begin{figure}[ht]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        file & CPU time & selected cycles & objective value \\
+        \hline
+        test2.txt & 0.041 seconds & 
+        \begin{tabular}{@{}c@{}} $(0, 8, 2)$, $(1, 10, 9)$, \\ $(3, 4, 5)$\end{tabular}
+        & 9 \\
+        \hline
+        test3.txt & 1.658 seconds & 
+        \begin{tabular}{@{}c@{}} $(0, 1, 14)$, $(2, 6)$, $(3)$, \\ $(4)$, $(5)$, $(7)$, $(8, 16)$, \\ $(9, 10)$, $(11)$, $(12)$, $(13)$, $(15)$  \end{tabular}
+        & 17 \\
+        \hline
+    \end{tabular}
+    \caption{Results and mean execution time over 10 iterations on an Intel i5-6200U processor.}
+\end{figure}
+
+\subsection*{Question 13}
 
 \end{document}

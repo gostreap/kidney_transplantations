@@ -1,8 +1,10 @@
 import numpy as np
 import os
+import networkx as nx
 
-from ilp import get_variables, get_obj_func, get_constraints, get_solution, is_integer_solution, solve_file
+from ilp import get_variables, get_obj_func, get_constraints, get_solution, is_integer_solution, solve, solve_file
 from minimal_infeasible_paths import minimal_infeasible_path
+from networkx.drawing.nx_agraph import to_agraph
 from pulp import LpMaximize, LpProblem, LpStatus, lpSum, LpVariable
 from utils import loadtxt, matrix_to_adjacency_list
 
@@ -90,10 +92,18 @@ def generate_problem(n, k, n_dataset):
             write_problem("dataset/non_integer_lp_solution_{}_{}_number_{}".format(n, k, i), n, k, M)
 
 
+def solve_and_write_solution(file, file_sol):
+    n, k, M = loadtxt(file)
+    best, solution = solve(n, k, M)
+    write_solution(file_sol, solution)
+    write_solution_png(M, solution, file=file_sol + ".png")
+
+
 def test_solve_file(file):
     best1, _ = pulp_solve_file(file)
     best2, _ = solve_file(file)
     return round(best1) == round(best2)
+
 
 def test_solve():
     res = []
@@ -102,4 +112,4 @@ def test_solve():
             res.append(test_solve_file("dataset/" + file))
     print("Correct :", res.count(True), "- Incorrect :", res.count(False))
 
-test_solve()
+solve_and_write_solution("dataset/non_integer_lp_solution_5_3_number_3", "solution/non_integer_lp_solution_5_3_number_3")

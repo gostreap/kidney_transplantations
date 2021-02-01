@@ -1,6 +1,4 @@
 from random import randint, sample
-import networkx as nx
-from networkx.drawing.nx_agraph import to_agraph
 
 
 def loadtxt(path):

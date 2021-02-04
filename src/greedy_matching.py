@@ -1,42 +1,21 @@
-from utils import generate_data, get_graph_from_K
-from jgraph import plot
+def greedy_matching(n, K, P, U, is_matched=None):
+    M = []
+    if is_matched is None:
+        is_matched = [False for i in range(n)]
+    sorted_K = []
 
-
-def greedy_matching(n, K, P, U):
-    c, w = [], []
-    matched = [False for i in range(n)]
-    # We run through the priority list of the patient and give them their best choice.
-    for i in U:
-        if matched[i]:
-            continue
-        for j in P[i]:
-            if j == "w":
-                w.append(i)
-                matched[i] = True
-                break
-            elif not matched[j] and i in K[j]:
-                c.append((i, j))
-                matched[i] = matched[j] = True
-                break
-
-    return c, w
-
-
-def run_random(n):
-    n, K, P, U = generate_data(n)
-    print(U)
     for i in range(n):
-        print(i, "->", K[i], "-", P[i])
-    g = get_graph_from_K(n, K)
-    c, w = greedy_matching(n, K, P, U)
+        sorted_K.append(list(K[i]))
+        sorted_K[i].sort(key=lambda x: P[i][x], reverse=True)
 
-    for i, j in c:
-        print(i, j)
-        g.es[g.get_eid(i, j)]["color"] = "red"
-    plot(g)
-    return greedy_matching(n, K, P, U)
+    for u in U:
+        if not is_matched[u]:
+            for v in sorted_K[u]:
+                if not is_matched[v]:
+                    if P[v][u] >= P[v][v] and P[v][u] >= P[v][n]:
+                        M.append((u, v))
+                        is_matched[u] = True
+                        is_matched[v] = True
+                        break
 
-
-c, w = run_random(5)
-print("c ->", c)
-print("w ->", w)
+    return M

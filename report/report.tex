@@ -8,6 +8,8 @@
 \SetKw{KwNot}{not}
 \SetKw{KwAnd}{and}
 \SetKw{KwInIterate}{in}
+\SetKw{KwBreak}{break}
+
 
 \SetKwBlock{Init}{initialization}{}{}
 
@@ -496,7 +498,7 @@ The implementation in python is pretty straightforward. The python function take
 
 Our matching algorithm must prioritize the patients with the highest priority. It must also ensure that all patients will leave with a donor that suited them better than their paired donor and the waiting list, otherwise some patients may not participate in the exchange program.
 
-Our greedy algorithm therefore consists of browsing the patients in descending order of priority and matching them to their preferred donor whose paired patient does not prefer the waiting list or his donor to the donor of the priority patient.
+Our greedy algorithm therefore consists of browsing the patients in descending order of priority and matching them to their preferred donor whose paired patient does not prefer the waiting list or his donor to the donor of the priority patient. Note that a patient can be matched to his own donor.
 
 \begin{algorithm}[H]
     % \DontPrintSemicolon
@@ -520,17 +522,16 @@ Our greedy algorithm therefore consists of browsing the patients in descending o
     \Begin{
     
     \tcc{Iterate over all patient by decreasing priority}
-    \For{\KwNot $U.is\_empty()$}{
-        u = U.pop()\;
+    \For{ $u \in U$}{
         \If{\KwNot $is\_matched[u]$}{
-            \While{\KwNot $sorted\_K[u].is\_empty()$}{
-                v = sorted\_K[u].pop()\;
+            \For{$v \in sorted\_K[u]$}{
                 \If{\KwNot $is\_matched[v]$}{
                     \tcc{If $t_v$ prefer $k_u$ over $k_v$ and $w$}
-                    \If{$t_v \, P_v \, t_u$ \KwAnd $t_v \, P_v \, w$}{
+                    \If{$k_v \, P_v \, k_u$ \KwAnd $k_v \, P_v \, w$}{
                         $M = M \cup \{((k_u, t_u), (k_v, t_v))\}$\;
                         is\_matched[u] = True\;
                         is\_matched[v] = True\;
+                        \KwBreak \;
                     }
                 }
             }
@@ -542,6 +543,8 @@ Our greedy algorithm therefore consists of browsing the patients in descending o
 \end{algorithm}
 
 We start by initializing an $is\_matched$ array to keep track of which pair has already been matched and an integer list array $sorted\_K$ that contains, for each patient of index $i$, the indexes of the preferred donors in descending order of preference. The sort function returns a list of the elements of $K_i$ sorted in descending order according to the preference relation $P_i$.
+
+The implementation is almost exactly the pseudo-code.
 
 \section{Efficient stategy-proof exchange mechanism}
 

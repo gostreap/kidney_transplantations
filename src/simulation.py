@@ -144,7 +144,6 @@ def get_stat_of_matching(M):
 def get_list_of_assigned_from_matching(M):
     assigned = set()
     for (u, v) in M:
-        assigned.add(u)
         assigned.add(v)
     return list(assigned)
 
@@ -161,9 +160,8 @@ def greedy_preprocess(n, K, P, U):
     for a in assigned:
         is_matched[a] = True
         assigned = get_list_of_assigned_from_matching(M)
-    M = greedy_matching(n, K, P, U, is_matched=is_matched)
-    assigned = assigned + get_list_of_assigned_from_matching(M)
-    return assigned
+    M = M + greedy_matching(n, K, P, U, is_matched=is_matched)
+    return M
 
 
 def run_all():
@@ -176,9 +174,10 @@ def run_all():
         n, c, patients, donors, cadavers, K, P = read_data(
             "dataset/question_13_number_{}".format(i)
         )
-        U= list(range(30))
+        U = list(range(30))
 
         M, w = direct_donation(n, K)
+        print(M)
         assigned = get_list_of_assigned_from_matching(M)
         not_assigned = get_not_assigned_from_assigned(assigned)
         not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
@@ -186,13 +185,16 @@ def run_all():
         dd.append((len(assigned), not_assigned_mean_rank))
 
         M = greedy_matching(n, K, P, U)
+        print(M)
         assigned = get_list_of_assigned_from_matching(M)
         not_assigned = get_not_assigned_from_assigned(assigned)
         not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
 
         gm.append((len(assigned), not_assigned_mean_rank))
 
-        assigned = greedy_preprocess(n, K, P, U)
+        M = greedy_preprocess(n, K, P, U)
+        print(M)
+        assigned = get_list_of_assigned_from_matching(M)
         not_assigned = get_not_assigned_from_assigned(assigned)
         not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
 
@@ -226,8 +228,8 @@ def run_all():
     print(cc_assigned_mean / 100 / 30, cc_not_assigned_mean_rank / 100)
 
 
-# gen_question_13()
-# run_all()
+gen_question_13()
+run_all()
 
 # for i in range(1, 10):
 #     n, c, patients, donors, cadavers, K, P = read_data(
@@ -236,8 +238,8 @@ def run_all():
 #     U = list(range(n))
 #     cycles_and_chains_matching(n, K, P, U)
 
-n, c, patients, donors, cadavers, K, P = read_data(
-                "dataset/question_13_number_{}".format(3)
-            )
-U = list(range(n))
-cycles_and_chains_matching(n, K, P, U)
+# n, c, patients, donors, cadavers, K, P = read_data(
+#                 "dataset/question_13_number_{}".format(3)
+#             )
+# U = list(range(n))
+# cycles_and_chains_matching(n, K, P, U)

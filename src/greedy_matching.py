@@ -14,6 +14,8 @@ def greedy_matching(n, K, P, U, is_matched=None):
                 if not is_matched[v]:
                     if P[v][u] >= P[v][v] and P[v][u] >= P[v][n]:
                         M.append((u, v))
+                        if v != u:
+                            M.append((v, u))
                         is_matched[u] = True
                         is_matched[v] = True
                         break

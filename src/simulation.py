@@ -156,6 +156,18 @@ def get_not_assigned_from_assigned(assigned):
     return list(total - set(assigned))
 
 
+def assign_to_cadavers(not_assigned, cadavers, patients):
+    not_assigned.sort()
+    available = [True for cadaver in cadavers]
+    assigned = []
+    for p in not_assigned:
+        for i, cadaver in enumerate(cadavers):
+            if available[i] and is_compatible(patients[p],cadaver):
+                available[i] = False
+                assigned.append(p)
+    return assigned
+
+
 def greedy_preprocess(n, K, P, U):
     M, _ = direct_donation(n, K)
     assigned = get_list_of_assigned_from_matching(M)
@@ -185,53 +197,62 @@ def run_all():
         print([(donors[u], patients[v]) for (u, v) in M])
         assigned = get_list_of_assigned_from_matching(M)
         not_assigned = get_not_assigned_from_assigned(assigned)
+        new_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
         not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
 
-        dd.append((len(assigned), not_assigned_mean_rank))
+        dd.append((len(new_assigned) + len(assigned), not_assigned_mean_rank, len(new_assigned)))
 
         M = greedy_matching(n, K, P, U)
         print(M, len(M))
         assigned = get_list_of_assigned_from_matching(M)
         not_assigned = get_not_assigned_from_assigned(assigned)
+        new_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
         not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
 
-        gm.append((len(assigned), not_assigned_mean_rank))
+        gm.append((len(new_assigned) + len(assigned), not_assigned_mean_rank, len(new_assigned)))
 
         M = greedy_preprocess(n, K, P, U)
         print(M, len(M))
         assigned = get_list_of_assigned_from_matching(M)
         not_assigned = get_not_assigned_from_assigned(assigned)
+        new_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
         not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
 
-        gmp.append((len(assigned), not_assigned_mean_rank))
+        gmp.append((len(new_assigned) + len(assigned), not_assigned_mean_rank, len(new_assigned)))
 
         M = cycles_and_chains_matching(n, K, P, U)
         print(M, len(M))
         assigned = get_list_of_assigned_from_matching(M)
         not_assigned = get_not_assigned_from_assigned(assigned)
+        new_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
         not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
 
-        cc.append((len(assigned), not_assigned_mean_rank))
+        cc.append((len(new_assigned) + len(assigned), not_assigned_mean_rank, len(new_assigned)))
 
-    dd_assigned_mean, dd_not_assigned_mean_rank = 0, 0
-    gm_assigned_mean, gm_not_assigned_mean_rank = 0, 0
-    gmp_assigned_mean, gmp_not_assigned_mean_rank = 0, 0
-    cc_assigned_mean, cc_not_assigned_mean_rank = 0, 0
+    dd_assigned_mean, dd_not_assigned_mean_rank, dd_new_assigned_mean = 0, 0, 0
+    gm_assigned_mean, gm_not_assigned_mean_rank, gm_new_assigned_mean = 0, 0, 0
+    gmp_assigned_mean, gmp_not_assigned_mean_rank, gmp_new_assigned_mean = 0, 0, 0
+    cc_assigned_mean, cc_not_assigned_mean_rank, cc_new_assigned_mean = 0, 0, 0
 
     for i in range(100):
         dd_assigned_mean += dd[i][0]
-        dd_not_assigned_mean_rank += dd[i][1]
         gm_assigned_mean += gm[i][0]
-        gm_not_assigned_mean_rank += gm[i][1]
         gmp_assigned_mean += gmp[i][0]
-        gmp_not_assigned_mean_rank += gmp[i][1]
         cc_assigned_mean += cc[i][0]
+        dd_not_assigned_mean_rank += dd[i][1]
+        gm_not_assigned_mean_rank += gm[i][1]
+        gmp_not_assigned_mean_rank += gmp[i][1]
         cc_not_assigned_mean_rank += cc[i][1]
+        dd_new_assigned_mean += dd[i][2]
+        gm_new_assigned_mean += gm[i][2]
+        gmp_new_assigned_mean += gmp[i][2]
+        cc_new_assigned_mean += cc[i][2]
+        
 
-    print(dd_assigned_mean / 100 / 30, dd_not_assigned_mean_rank / 100)
-    print(gm_assigned_mean / 100 / 30, gm_not_assigned_mean_rank / 100)
-    print(gmp_assigned_mean / 100 / 30, gmp_not_assigned_mean_rank / 100)
-    print(cc_assigned_mean / 100 / 30, cc_not_assigned_mean_rank / 100)
+    print(dd_assigned_mean / 100 / 30, dd_not_assigned_mean_rank / 100, dd_new_assigned_mean / 100)
+    print(gm_assigned_mean / 100 / 30, gm_not_assigned_mean_rank / 100, gm_new_assigned_mean / 100)
+    print(gmp_assigned_mean / 100 / 30, gmp_not_assigned_mean_rank / 100, gmp_new_assigned_mean / 100)
+    print(cc_assigned_mean / 100 / 30, cc_not_assigned_mean_rank / 100, cc_new_assigned_mean / 100)
 
 
 gen_question_13()

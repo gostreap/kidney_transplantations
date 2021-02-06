@@ -474,18 +474,18 @@
 \caption{Direct Donation}
 
 \KwIn{A number $n$ of patient and, for all patients $i \in \N$, their set of compatible donors $K_i \subseteq [\![1, n]\!]$.}
-\KwOut{A set of pairs donor-patient pairs $c$ and a waiting list $w$.}
+\KwOut{A set of pairs donor-patient pairs $M$ and a waiting list $w$.}
 \Init{
-    $c = \emptyset$\;
+    $M = \emptyset$\;
     $w = []$\;
 }
 \Begin{
 \For{$i = 1$ \KwTo $n$}{
-    \If{$i \in K_i$}{
-        $c = c \cup \{(i,i)\}$\; 
+    \If{$k_i \in K_i$}{
+        $M = M \cup \{(k_i,t_i)\}$\; 
     }
     \Else{
-        $w$.add($i$)
+        $w$.add($t_i$)
     }
 }
 \Return{$c$, $w$}}
@@ -528,7 +528,7 @@ Our greedy algorithm therefore consists of browsing the patients in descending o
                 \If{\KwNot $is\_matched[v]$}{
                     \tcc{If $t_v$ prefer $k_u$ over $k_v$ and $w$}
                     \If{$k_v \, P_v \, k_u$ \KwAnd $k_v \, P_v \, w$}{
-                        $M = M \cup \{((k_u, t_u), (k_v, t_v))\}$\;
+                        $M = M \cup \{((k_u, t_v), (k_v, t_u))\}$\;
                         is\_matched[u] = True\;
                         is\_matched[v] = True\;
                         \KwBreak \;
@@ -555,6 +555,99 @@ Let $(k_1,t_1)$ be a pair of donor-patient and assume there is no cycle. Conside
 Thus either there exists a cycle, or each pair is the tail of some $w$-chain.
 
 \subsection*{Question 4}
+
+The general sequence of the algorithm is shown in the algorithm below. For the sake of brevity, we omit some auxiliary functions like \texttt{GetCycles}, which returns the cycles in a directed graph, or \texttt{Update}, which updates the state of the graph according to the procedure described in the project description. The others not detailed functions will be discussed after the algorithm and the pseudo-code of \texttt{SelectChainA} is given in algorithm \ref{ccaux}.
+
+\begin{algorithm}[H]
+    \SetKwFunction{AssChain}{AssignChain}
+    \SetKwFunction{AssCycle}{AssignCycle}
+    \SetKwFunction{GetCycles}{GetCycles}
+    \SetKwFunction{SelectChainA}{SelectChainA}
+    \SetKwFunction{Update}{Update}
+
+    % \DontPrintSemicolon
+    \caption{Cycles and Chains Matching Algorithm}
+    
+    \KwIn{A number $n$ of patient, a strict priority list of the patients $U$ and, for all patients $i \in \N$, their set of compatible donors $K_i \subseteq [\![1, n]\!]$, their strict preference relation $P_i$ over $K_i \cup \{k_i, w\}$ and the initial graph $G$.}
+    \KwOut{A matching $M$.}
+
+    \Init{
+    $M = \emptyset$\;
+    $removed = \emptyset$\;
+    $passive = \emptyset$\;
+    $unavailable = \emptyset$\;
+    }
+
+    \Begin{
+    
+    \While{$|removed| + |passive| \neq n$}{
+        cycles = \GetCycles{G}\;
+        \If{$|cycles| \neq 0$}{
+            \For{$cycle \in cycles$}{
+                \AssCycle{cycle}\tcp*{modifies $M$ and $removed$}
+            }
+        }
+        \Else{
+            chain = \SelectChainA{G}\;
+            \tcc{modifies $M$, $passive$ and $unavailable$}
+            \AssChain{chain}\;
+        }
+        \Update{G}\;
+    }
+    \Return{M}
+    }
+    
+\end{algorithm}
+
+At any time, we keep up to date the $ removed $ set of vertices removed from the graph during the cycle deletion, the $ passive $ set of vertices which are still in the graph but whose target no longer changes, as well as the $ unavailable $ set of vertices to which we can no longer point. Those sets allow to update the graph without difficulty. Each time we choose a $w$-chain, all of its vertices are added to $ passive $ and all vertices except the head are added to $ unavailable $. These operations are performed by the \texttt{AssignCycle} and \texttt{AssignChain} functions. 
+
+We still have to discuss a crucial part of the algorithm, the chain selection rule A. According to the rule statement, the first thing to do is find the longest chains.
+
+In order to quickly obtain the longest chains, it should be noted that the transposed graph is a tree with root $ w $. A depth-first search gives us the depth of all vertices in the tree. Once the depths are obtained, it is very easy to find the longest chains. This is what the omitted \texttt{GetLongestChains} function does.
+
+Once we have the longest chains, we still need to find the one with the patient with the highest priority. For this, we take all the patients who appear in the longest chains, and we sort them in decreasing order of priority. Then, we iterate on this patient list, look to which chain the patient belongs to, and remove all the other chains. When there's only one chain left, we've found the one we're interested in.
+
+\begin{algorithm*}[H]
+    \label{ccaux}
+    \SetKwFunction{AssChain}{AssignedChain}
+    \SetKwFunction{AssCycle}{AssignedCycle}
+    \SetKwFunction{GetCycles}{GetCycles}
+    \SetKwFunction{GetLongestChains}{GetLongestChains}
+    \SetKwFunction{SelectChainA}{SelectChainA}
+    \SetKwFunction{Update}{Update}
+
+    \SetKwProg{Fn}{Function}{:}{}
+
+
+    % \DontPrintSemicolon
+    \caption{Chain Selection Rule A}
+
+    \Fn{\SelectChainA{}}{
+        chains = \GetLongestChains{}\;
+        $nodes = \emptyset$\;
+        \For{$chain \in chains$}{
+            $nodes = nodes \cup chain$ 
+        }
+        \For{$node \in nodes$ by decreasing priority}{
+            $new\_chains = \emptyset$\;
+            \For{$chain \in chains$}{
+                \If{$node \in chain$}{
+                    $new\_chains = new\_chains \cup chain$ \;
+                }
+            }
+            \If{$|new\_chains| = 1$}{
+                \Return{$new\_chains.pop()$}\;
+            }
+            \ElseIf{$|new\_chains| > 1$}{
+                chains = new\_chains\;
+            }
+        }
+    }
+    
+\end{algorithm*}
+
+For the implementation, readability was preferred over pure efficiency, which is why an object structure with heavy use of python set was preferred. The use of python set is also due to the fact that we often have to test the membership of an element in a set, whether for the construction of the graph, in the cycle search, or in the selection of the chain.
+To make things a bit simpler, we can notice that, since a donor always points to his paired patient, there is no need to have a separate node for the donor and the patient. Thus in the implementation, there is only one node in the graph for each donor-patient pair.
 
 \subsection*{Question 5}
 
@@ -600,14 +693,20 @@ If we swap $k_8$ and $k_9$ in the order of preference of the twelfth patient, th
 
 \subsection*{Question 8}
 
+The first two rounds are the same as with rule A. In the third round, we choose the $w$-chain starting with $(k_1, t_1)$, the highest priority pair. As with rule A, during the fourth round we delete the cycle $(k_4, t_4, k_8, t_8)$. Finally, on round 5 and 6, pairs $(k_{10}, t_{10})$ then $(k_{12}, t_{12})$ come to lengthen the chain formed in the third round. The final matching is the same as the one obtained with rule A.
+
+Graphs associated with every round are shown in figure \ref{fig:ruleB}.
+
 \newpage
 
 \begin{figure}[!ht]
     \centering
     \scalebox{0.5}{\ruleB}
-    \caption{State of the graph at every round.}
+    \caption{Problem Graph at the beginning of each round.}
     \label{fig:ruleB}
 \end{figure}
+
+In agreement with Theorem 2, we can notice that agents cannot hope to get a better assignment by lying about their preferences. For example, the strategy used in the previous question by the twelfth patient is no longer effective, because whatever his preferences, he will be affected last.
 
 \section{Integer programming formulation}
 

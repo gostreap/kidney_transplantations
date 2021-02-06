@@ -1,194 +1,215 @@
-def construct_cycle(next_vertices, start):
-    cycle = [start]
-    while next_vertices[cycle[-1]] != start:
-        cycle.append(next_vertices[cycle[-1]])
-    return cycle
-
-
-def detect_cycle(next_vertices, removed):
-    n = len(next_vertices)
-    seen = set()
-    cycles = []
-    for i in range(len(next_vertices)):
-        if i in seen or i in removed:
-            continue
-        current_path = {i}
-        is_cycle = True
-        while next_vertices[i] not in current_path:
-            # If the next vertices is w then the current chain is not a cycle
-            if next_vertices[i] == n or next_vertices[i] in seen or next_vertices[i] in removed:
-                is_cycle = False
-                break
-
-            i = next_vertices[i]
-            current_path.add(i)
-
-        # i is in a cycle
-        if is_cycle:
-            # print("cycle", i, current_path)
-            cycles.append(construct_cycle(next_vertices, i))
-        seen = seen | current_path
-    return cycles
-
-
-def get_depth(tree, s, depth):
-    for i in tree[s]:
-        depth[i] = depth[s] + 1
-        depth = get_depth(tree, i, depth)
-    return depth
-
-
-def get_heads(depth, removed, is_matched):
-    # print(depth)
-    heads = []
-    max_depth = 0
-    for i, d in enumerate(depth):
-        if i < len(depth) - 1 and (i in removed or is_matched[i]):
-            continue
-        if d > max_depth:
-            heads = [i]
-            max_depth = d
-        elif d == max_depth:
-            heads.append(i)
-    return heads
-
-
-def get_chains(next_vertices, heads):
-    chains = []
-    for head in heads:
-        chain = []
-        current = head
-        n = len(next_vertices)
-        while current != n:
-            chain.append(current)
-            current = next_vertices[current]
-        chains.append(chain)
-    return chains
-
-
-def reverse_next_vertices(next_vertices, removed):
-    n = len(next_vertices)
-    reverse = [[] for i in range(n + 1)]
-    for i in range(n):
-        reverse[next_vertices[i]].append(i)
-    return reverse
-
-
-def select_chain_A(next_vertices, removed, is_matched, U):
-    n = len(next_vertices)
-    reverse_adjacency_lists = reverse_next_vertices(next_vertices, removed)
-    depth = [-1 for i in range(n + 1)]
-    depth[n] = 0
-    depth = get_depth(reverse_adjacency_lists, n, depth)
-
-    # print(depth)
-
-    heads = get_heads(depth, removed, is_matched)
+class Node:
     
-    # print(heads)
+    def __init__(self, id, n, K, P):
+        self.id = id
+        self.n = n # size of the graph but also id of w
+        self.K = K
+        self.P = P
+        self.sorted_K = list(K)
+        self.sorted_K.append(self.n)
+        self.sorted_K.sort(key=lambda x: P[x])
+        self.assigned = False
+        self.next = None
+        self.previous = []
 
-    chains = get_chains(next_vertices, heads)
-    
-    # print(chains)
-
-    if len(chains) == 1:
-        return chains[0]
-
-    vertices_in_chains = set()
-    for chain in chains:
-        vertices_in_chains = vertices_in_chains | set(chain)
-    pos_in_U = [-1 for i in range(n)]
-    for i, u in enumerate(U):
-        pos_in_U[u] = i
-    vertices_in_chains = list(vertices_in_chains)
-    vertices_in_chains.sort(key=lambda x: pos_in_U[x], reverse=True)
-    # chains_set = [set(chain) for chain in chains]
-    best_chains = [i for i in range(len(chains))]
-
-    for v in vertices_in_chains:
-        # print(chains)
-        # print(best_chains)
-        v_in = []
-        for i, chain in enumerate(chains):
-            if v in chain:
-                v_in.append(i)
-        if len(v_in) != 0:
-            chains = [chains[i] for i in v_in]
-        if len(chains) == 1:
-            return chains[0]
-
-
-def select_chain_B(next_vertices, U):
-    pass
-
-
-def update_graph(next_vertices, is_matched, removed, sorted_K):
-    n = len(is_matched)
-    for i in range(n):
-        if i in removed or is_matched[i]:
-            continue
-        find = False
-        while not find:
-            if sorted_K[i][-1] == n:
-                next_vertices[i] = n
-                find = True
-            elif sorted_K[i][-1] in removed:
-                del sorted_K[i][-1]
+    def set_next(self, nodes, removed, unavailable):
+        if self.assigned:
+            return
+        self.next = None
+        while self.next is None:
+            if self.sorted_K[-1] == self.n:
+                self.next = self.n
+            elif nodes[self.sorted_K[-1]] in removed or nodes[self.sorted_K[-1]] in unavailable:
+                del self.sorted_K[-1]
             else:
-                next_vertices[i] = sorted_K[i][-1]
-                find = True
-    return next_vertices
+                self.next = nodes[self.sorted_K[-1]]
 
+    def get_depth(self, depth):
+        for node in self.previous:
+            depth[node.id] = depth[self.id] + 1
+            depth = node.get_depth(depth)
+        return depth
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)): 
+            return False
+        return self.id == other.id
+
+    def __str__(self):
+        return "n" + str(self.id)
+
+    def __repr__(self):
+        return self.__str__()
+
+class Graph:
+    
+    def __init__(self, n, K, P, U):
+        self.n = n
+        self.K = K
+        self.P = P
+        self.U = U
+        self.removed = set()
+        self.passive = set()
+        self.unavailable = set()
+        self.nodes = []
+        for id in range(n):
+            self.nodes.append(Node(id, n, K[id], P[id]))
+        self.pos_in_U = [-1 for i in range(n)]
+        for i, u in enumerate(U):
+            self.pos_in_U[u] = i
+
+    def set_previous(self):
+        for node in self.nodes:
+            node.previous = []
+        for node in self.nodes:
+            if node.next != self.n:
+                node.next.previous.append(node)
+
+    def update(self):
+        for node in set(self.nodes) - (self.removed | self.passive):
+            node.set_next(self.nodes, self.removed, self.unavailable)
+        self.set_previous()
+
+    def assign_cycle(self, cycle):
+        for node in cycle:
+            node.assigned = True
+            self.removed.add(node)
+
+    def assign_chain(self, chain):
+        for i, node in enumerate(chain):
+            node.assigned = True
+            self.passive.add(node)
+            if i!= 0:
+                self.unavailable.add(node)
+
+    def get_cycle(self, start):
+        cycle = [start]
+        while cycle[-1].next != start:
+            cycle.append(cycle[-1].next)
+        return cycle
+
+    def get_cycles(self):
+        cycles = []
+        marked = self.removed.copy()
+        for node in set(self.nodes) - (self.removed | self.passive):
+            if node in marked:
+                continue
+            path = set()
+            while node not in marked and node != self.n:
+                if node in path:
+                    cycles.append(self.get_cycle(node))
+                    break
+                path.add(node)
+                node = node.next
+            marked = marked | path
+        return cycles
+
+    def get_depth(self):
+        depth = [-1 for _ in range(self.n)]
+        for node in self.nodes:
+            if node.next == self.n:
+                depth[node.id] = 1
+                depth = node.get_depth(depth)
+        return depth
+
+    def get_heads(self):
+        depth = self.get_depth()
+        # print(depth)
+        # depth_print = depth.copy()
+        # for i in range(self.n):
+        #     if self.nodes[i] in self.removed or self.nodes[i] in self.passive:
+        #         depth_print[i] = -1
+        # print(depth_print)
+        heads = []
+        max_depth = 0
+        for i, d in enumerate(depth):
+            if self.nodes[i] in self.removed or self.nodes[i] in self.passive:
+                continue
+            if d > max_depth:
+                heads = [self.nodes[i]]
+                max_depth = d
+            elif d == max_depth:
+                heads.append(self.nodes[i])
+        # print("heads", heads)
+        return heads
+
+    def get_longest_chains(self):
+        heads = self.get_heads()
+        chains = []
+        for head in heads:
+            chain = []
+            current = head
+            while current != self.n:
+                chain.append(current)
+                current = current.next
+            chains.append(chain)
+        # print("chains", chains)
+        return chains
+
+    def select_chain_A(self):
+        chains = self.get_longest_chains()
+        nodes_in_chains = set()
+        for chain in chains:
+            nodes_in_chains = nodes_in_chains | set(chain)
+        nodes_in_chains = list(nodes_in_chains)
+        nodes_in_chains.sort(key=lambda x: self.pos_in_U[x.id])
+
+        n_selectable = len(chains)
+        selectable = [True for chain in chains]
+        chains_set = [set(chain) for chain in chains]
+        for node in nodes_in_chains:
+            n_selectable = 0
+            selectable_loop = []
+            for i, chain in enumerate(chains):
+                if not selectable[i]:
+                    selectable_loop.append(False)
+                elif node not in chains_set[i]:
+                    selectable_loop.append(False)
+                else:
+                    selectable_loop.append(True)
+                    n_selectable += 1
+            if n_selectable == 1:
+                for i, chain in enumerate(chains):
+                    if selectable_loop[i]:
+                        return chain
+            elif n_selectable > 1:
+                selectable = selectable_loop
+
+    def is_every_nodes_assigned(self):
+        return len(self.removed | self.passive) == self.n
+
+    def get_assignement(self):
+        assignement = []
+        for node in self.nodes:
+            if node.assigned and node.next != self.n:
+                assignement.append((node.id, node.next.id))
+        return assignement
+
+    def __str__(self):
+        s = ""
+        for node in self.nodes:
+            s += str(node) + "->" + str(node.next) + ":" + str(node.previous) + "\n"
+        return s 
 
 def cycles_and_chains_matching(n, K, P, U, is_matched=None):
-    M = []
-    n_matched = n
-    if is_matched is None:
-        is_matched = [False for i in range(n)]
-    sorted_K = []
-    removed = set()
 
-    for i in range(n):
-        sorted_K.append(list(K[i]))
-        sorted_K[i].append(n)
-        sorted_K[i].sort(key=lambda x: P[i][x])
-        # print("P", i, P[i])
-        # print("sorted_K", i, sorted_K[i])
-
-    next_vertices = [0 for i in range(n)]
-    while n_matched != 0:
-        # print(n_matched)
-        # print("graph")
-        next_vertices = update_graph(next_vertices, is_matched, removed, sorted_K)
-        # print(next_vertices)
-        # print("after graph")
-        cycles = detect_cycle(next_vertices, removed)
+    g = Graph(n, K, P, U)
+    g.update()
+    # i = 0
+    while not g.is_every_nodes_assigned():
+        # print(i, len(g.removed | g.passive))
+        # i+=1
+        g.update()
+        cycles = g.get_cycles()
         if len(cycles) != 0:
-            # print("cycle")
-            # print(cycles)
             for cycle in cycles:
-                n_matched -= len(cycle)
-                for i in range(len(cycle) - 1):
-                    M.append((cycle[i], cycle[i + 1]))
-                    is_matched[cycle[i]] = True
-                    removed.add(cycle[i])
-                M.append((cycle[-1], cycle[0]))
-                is_matched[cycle[-1]] = True
-                removed.add(cycle[-1])
+                g.assign_cycle(cycle)
         else:
-            # print("before")
-            # print(removed)
-            # print(is_matched)
-            chain = select_chain_A(next_vertices, removed, is_matched, U)
-            if len(chain) == 0:
-                break
-            # print("after")
-            n_matched -= len(chain)
-            for i in range(len(chain) - 1):
-                M.append((chain[i], chain[i + 1]))
-                is_matched[chain[i]] = True
-                removed.add(chain[i+1])
-            is_matched[chain[-1]] = True
-
-    # print(M)
-    return M
+            chain = g.select_chain_A()
+            # print(chain)
+            g.assign_chain(chain)
+    g.select_chain_A()
+    return g.get_assignement()

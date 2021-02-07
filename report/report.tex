@@ -504,7 +504,7 @@ The implementation in python is pretty straightforward. The python function take
 
 Our matching algorithm must prioritize the patients with the highest priority. It must also ensure that all patients will leave with a donor that suited them better than their paired donor and the waiting list, otherwise some patients may not participate in the exchange program.
 
-Our greedy algorithm therefore consists of browsing the patients in descending order of priority and matching them to their preferred donor whose paired patient does not prefer the waiting list or his donor to the donor of the priority patient. Note that a patient can be matched to his own donor.
+Our greedy algorithm, therefore, consists of browsing the patients in descending order of priority and matching them to their preferred donor whose paired patient does not prefer the waiting list or his donor to the donor of the priority patient. Note that a patient can be assigned to his own donor.
 
 \begin{algorithm}[H]
     % \DontPrintSemicolon
@@ -548,7 +548,7 @@ Our greedy algorithm therefore consists of browsing the patients in descending o
     
 \end{algorithm}
 
-We start by initializing an $is\_matched$ array to keep track of which pair has already been matched and an integer list array $sorted\_K$ that contains, for each patient of index $i$, the indexes of the preferred donors in descending order of preference. The sort function returns a list of the elements of $K_i$ sorted in descending order according to the preference relation $P_i$.
+We start by initializing an $is\_matched$ array to keep track of which pair has already been assigned and an integer list array $sorted\_K$ that contains, for each patient of index $i$, the indexes of the preferred donors in descending order of preference. The sort function returns a list of the elements of $K_i$ sorted in descending order according to the preference relation $P_i$.
 
 The implementation is almost exactly the pseudo-code.
 
@@ -607,11 +607,11 @@ The general sequence of the algorithm is shown in the algorithm below. For the s
 
 At any time, we keep up to date the $ removed $ set of vertices removed from the graph during the cycle deletion, the $ passive $ set of vertices which are still in the graph but whose target no longer changes, as well as the $ unavailable $ set of vertices to which we can no longer point. Those sets allow to update the graph without difficulty. Each time we choose a $w$-chain, all of its vertices are added to $ passive $ and all vertices except the head are added to $ unavailable $. These operations are performed by the \texttt{AssignCycle} and \texttt{AssignChain} functions. 
 
-We still have to discuss a crucial part of the algorithm, the chain selection rule A. According to the rule statement, the first thing to do is find the longest chains.
+We still have to discuss a crucial part of the algorithm : the chain selection rule A. According to the rule statement, the first thing to do is find the longest chains.
 
 In order to quickly obtain the longest chains, it should be noted that the transposed graph is a tree with root $ w $. A depth-first search gives us the depth of all vertices in the tree. Once the depths are obtained, it is very easy to find the longest chains. This is what the omitted \texttt{GetLongestChains} function does.
 
-Once we have the longest chains, we still need to find the one with the patient with the highest priority. For this, we take all the patients who appear in the longest chains, and we sort them in decreasing order of priority. Then, we iterate on this patient list, look to which chain the patient belongs to, and remove all the other chains. When there's only one chain left, we've found the one we're interested in.
+Once we have the longest chains, we still need to find the one with the patient with the highest priority. For this, we take all the patients who appear in the longest chains, and we sort them in decreasing order of priority. Then, we iterate on this patient list, look to which chain the patient belongs to and remove all the other chains. When there's only one chain left, we've found the one we're interested in.
 
 \begin{algorithm*}[H]
     \label{ccaux}
@@ -652,7 +652,7 @@ Once we have the longest chains, we still need to find the one with the patient 
     
 \end{algorithm*}
 
-For the implementation, readability was preferred over pure efficiency, which is why an object structure with heavy use of python set was preferred. The use of python set is also due to the fact that we often have to test the membership of an element in a set, whether for the construction of the graph, in the cycle search, or in the selection of the chain.
+For the implementation, readability was preferred over pure efficiency, which is why an object structure with heavy use of python set was preferred. The use of python set is also due to the fact that we often have to test the membership of an element in a set, whether for the construction of the graph, the cycle search, or the selection of the chain.
 To make things a bit simpler, we can notice that, since a donor always points to his paired patient, there is no need to have a separate node for the donor and the patient. Thus in the implementation, there is only one node in the graph for each donor-patient pair.
 
 \subsection*{Question 5}
@@ -663,7 +663,7 @@ The initial graph contains a cycle $C_1 = (k_3, t_3, k_2, t_2, k_{11}, t_{11})$.
 
 After removing the first circle, a new circle $C_2 = (k_5, t_5, k_7, t_7, k_6, t_6)$ is formed. In the second round, this cycle is therefore deleted.
 
-At the start of the third round, there is no more circle. The graph contains longest $w$-chains : $W_1 = (k_8, t_8, k_4, t_4, k_9, t_9)$ and $W_2 = (k_{10}, t_{10}, k_1, t_1, k_9, t_9)$. Since the highest priority patient $ t_1 $ is only present in $W_2$,  $W_2$ is chosen. The kidneys are assigned and the chain remains in the graph for the next round but patients pointing to other kidneys than $k_10$ in the chain are redirected.
+At the start of the third round, there is no more circle. The graph contains longest $w$-chains : $W_1 = (k_8, t_8, k_4, t_4, k_9, t_9)$ and $W_2 = (k_{10}, t_{10}, k_1, t_1, k_9, t_9)$. Since the highest priority patient $ t_1 $ is only present in $W_2$,  $W_2$ is chosen. The kidneys are assigned and the chain remains in the graph for the next round but patients pointing to other kidneys than $k_{10}$ in the chain are redirected.
 
 After the redirect, a new circle $ C_3 = (k_4, t_4, k_8, t_8)$ has formed. The fourth round therefore consists in the elimination of this cycle.
 
@@ -691,7 +691,7 @@ The final matching is:
 \newpage 
 \subsection*{Question 6}
 
-If the selection rule keep in the procedure any selected $w$-chain at a non-terminal round, then every unassigned kidney is available at every round of the procedure. Therefore, at every round of the algorithm, a patient can only be assigned to his best choice among remaining kidneys. The only way to give him a better kidney is to take it back from a patient whose assignement occurs in a previous round. Since this patient had his best choice at the time, he will strictly disprefer the new matching. Thus, the exchange mechanism is efficient.
+If the selection rule keeps in the procedure any selected $w$-chain at a non-terminal round, then every unassigned kidney is available at every round of the procedure. Therefore, at every round of the algorithm, a patient can only be assigned to his best choice among remaining kidneys. The only way to give him a better kidney is to take it back from a patient whose assignment occurs in a previous round. Since this patient has his best choice at the time, he will strictly disprefer the new matching. Thus, the exchange mechanism is efficient.
 
 \subsection*{Question 7}
 
@@ -703,6 +703,8 @@ The first two rounds are the same as with rule A. In the third round, we choose 
 
 Graphs associated with every round are shown in figure \ref{fig:ruleB}.
 
+In agreement with Theorem 2, we can notice that agents cannot hope to get a better assignment by lying about their preferences. For example, the strategy used in the previous question by the twelfth patient is no longer effective, because whatever his preferences, he will be affected last.
+
 \newpage
 
 \begin{figure}[!ht]
@@ -712,13 +714,11 @@ Graphs associated with every round are shown in figure \ref{fig:ruleB}.
     \label{fig:ruleB}
 \end{figure}
 
-In agreement with Theorem 2, we can notice that agents cannot hope to get a better assignment by lying about their preferences. For example, the strategy used in the previous question by the twelfth patient is no longer effective, because whatever his preferences, he will be affected last.
-
 \section{Integer programming formulation}
 
 \subsection*{Question 9}
 
-In order to list all the minimal infeasible paths, we will simply use a recursive function \texttt{Aux} which, given a graph $G$, a vertex $v$ and an integer $k$, returns all the paths of lengths $k+1$ starting at $v$. In order to avoid cycles, we add an $inpath$ variable, a set containing the vertices already in the current path. Finally, we called this function on all the vertices of the graph.
+In order to list all the minimal infeasible paths, we will simply use a recursive function \texttt{Aux} which, given a graph $G$, a vertex $v$ and an integer $k$, returns all the paths of lengths $k+1$ starting at $v$. In order to avoid cycles, we add an $inpath$ variable, a set containing the vertices already in the current path. Finally, we called this function on all vertices.
 
 \begin{algorithm}
     \SetKwFunction{Faux}{Aux}
@@ -757,7 +757,7 @@ In order to list all the minimal infeasible paths, we will simply use a recursiv
     }
 \end{algorithm}
 
-The implementation in python is very similar to the pseudo-code, except that the algorithm returns a list of paths rather than a set. The graph is given in the form of adjacency lists, in order to be able to iterate quickly on the neighbors.
+The implementation in python is very similar to the pseudo-code, except that the algorithm returns a list of paths rather than a set. The graph is given in the form of adjacency lists, in order to be able to iterate quickly on neighbors.
 
 \begin{figure}[ht]
     \centering

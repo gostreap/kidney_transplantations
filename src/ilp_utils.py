@@ -113,5 +113,5 @@ def test_solve():
     print("Correct :", res.count(True), "- Incorrect :", res.count(False))
 
 
-solve_and_write_solution("dataset/test2.txt", "solution/test2")
-solve_and_write_solution("dataset/test3.txt", "solution/test3")
+# solve_and_write_solution("dataset/test2.txt", "solution/test2")
+# solve_and_write_solution("dataset/test3.txt", "solution/test3")

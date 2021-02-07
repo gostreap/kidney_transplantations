@@ -18,28 +18,6 @@ def loadtxt(path):
     return n, K, M
 
 
-def generate_data(n):
-    """
-    Return the number of donor-patient pairs n, an array of set of compatible kidneys K, \
-    an array of preference list P and an priority list of the patient U.
-    """
-    rg = list(range(n))
-    K = []
-    P = []
-    U = sample(rg, len(rg))
-
-    for i in range(n):
-        list_of_kidneys = sample(rg, randint(1, n))
-        K.append(set(list_of_kidneys))
-        if i in K[i]:
-            P.append(sample(list_of_kidneys + ["w"], len(list_of_kidneys) + 1))
-            id_i = P[i].index(i)
-            P[i][0], P[i][id_i] = P[i][id_i], P[i][0]
-        else:
-            P.append(sample(list_of_kidneys + [i, "w"], len(list_of_kidneys) + 2))
-    return n, K, P, U
-
-
 def matrix_to_adjacency_list(M):
     lists = []
     for i, row in enumerate(M):

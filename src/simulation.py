@@ -1,7 +1,7 @@
 from random import random, shuffle
 from direct_donation import direct_donation
 from greedy_matching import greedy_matching
-from cycles_and_chains_matching_new import cycles_and_chains_matching
+from cycles_and_chains_matching import cycles_and_chains_matching
 
 
 def get_random_blood_type():
@@ -45,8 +45,8 @@ def generate_data(n, c):
         order = list(K[i])
         shuffle(order)
         max = len(order)
-        if i in K[i]:
-            # max += 1
+        if i not in K[i]:
+            max += 1
             if random() <= 0.5:
                 P[i][i], P[i][n] = 1, 0
             else:
@@ -54,12 +54,8 @@ def generate_data(n, c):
         else:
             P[i][n] = 0
         
-        delta = 0
         for j, e in enumerate(order):
-            if e != i:
-                P[i][e] = max - j + delta
-            else:
-                delta = 1
+            P[i][e] = max - j
 
     return patients, donors, cadavers, K, P
 
@@ -134,16 +130,6 @@ def gen_question_13():
         )
 
 
-def get_stat_of_matching(M):
-    total = 0
-    for (u, v) in M:
-        if u == v:
-            total += 1
-        else:
-            total += 2
-    return total
-
-
 def get_list_of_assigned_from_matching(M):
     assigned = set()
     for (u, v) in M:
@@ -168,6 +154,14 @@ def assign_to_cadavers(not_assigned, cadavers, patients):
     return assigned
 
 
+def own_donor(M):
+    count = 0
+    for (u, v) in M:
+        if u == v:
+            count += 1
+    return count
+
+
 def greedy_preprocess(n, K, P, U):
     M, _ = direct_donation(n, K)
     assigned = get_list_of_assigned_from_matching(M)
@@ -179,101 +173,59 @@ def greedy_preprocess(n, K, P, U):
     return M
 
 
-def run_all():
-    dd = []
-    gm = []
-    gmp = []
-    cc = []
-    for i in range(1, 101):
-        print("run", i)
+def cc_preprocess(n, K, P, U):
+    M, _ = direct_donation(n, K)
+    assigned = get_list_of_assigned_from_matching(M)
+    is_matched = [False for u in U]
+    for a in assigned:
+        is_matched[a] = True
+        # assigned = get_list_of_assigned_from_matching(M)
+    M = M + cycles_and_chains_matching(n, K, P, U, is_matched=is_matched)
+    return M
 
-        n, c, patients, donors, cadavers, K, P = read_data(
+
+def direct_donation_M(n, K, P, U):
+    M, _ = direct_donation(n, K)
+    return M
+
+
+def get_stats():
+    func = [direct_donation_M, greedy_matching, greedy_preprocess, cycles_and_chains_matching, cc_preprocess]
+    
+    for f in func:
+        data = []
+        for i in range(1, 101):
+            n, c, patients, donors, cadavers, K, P = read_data(
             "dataset/question_13_number_{}".format(i)
-        )
-        U = list(range(30))
-
-        M, w = direct_donation(n, K)
-        print(M, len(M))
-        print([(donors[u], patients[v]) for (u, v) in M])
-        assigned = get_list_of_assigned_from_matching(M)
-        not_assigned = get_not_assigned_from_assigned(assigned)
-        new_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
-        not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
-
-        dd.append((len(new_assigned) + len(assigned), not_assigned_mean_rank, len(new_assigned)))
-
-        M = greedy_matching(n, K, P, U)
-        print(M, len(M))
-        assigned = get_list_of_assigned_from_matching(M)
-        not_assigned = get_not_assigned_from_assigned(assigned)
-        new_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
-        not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
-
-        gm.append((len(new_assigned) + len(assigned), not_assigned_mean_rank, len(new_assigned)))
-
-        M = greedy_preprocess(n, K, P, U)
-        print(M, len(M))
-        assigned = get_list_of_assigned_from_matching(M)
-        not_assigned = get_not_assigned_from_assigned(assigned)
-        new_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
-        not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
-
-        gmp.append((len(new_assigned) + len(assigned), not_assigned_mean_rank, len(new_assigned)))
-
-        M = cycles_and_chains_matching(n, K, P, U)
-        print(M, len(M))
-        assigned = get_list_of_assigned_from_matching(M)
-        not_assigned = get_not_assigned_from_assigned(assigned)
-        new_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
-        not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
-
-        cc.append((len(new_assigned) + len(assigned), not_assigned_mean_rank, len(new_assigned)))
-
-    dd_assigned_mean, dd_not_assigned_mean_rank, dd_new_assigned_mean = 0, 0, 0
-    gm_assigned_mean, gm_not_assigned_mean_rank, gm_new_assigned_mean = 0, 0, 0
-    gmp_assigned_mean, gmp_not_assigned_mean_rank, gmp_new_assigned_mean = 0, 0, 0
-    cc_assigned_mean, cc_not_assigned_mean_rank, cc_new_assigned_mean = 0, 0, 0
-
-    for i in range(100):
-        dd_assigned_mean += dd[i][0]
-        gm_assigned_mean += gm[i][0]
-        gmp_assigned_mean += gmp[i][0]
-        cc_assigned_mean += cc[i][0]
-        dd_not_assigned_mean_rank += dd[i][1]
-        gm_not_assigned_mean_rank += gm[i][1]
-        gmp_not_assigned_mean_rank += gmp[i][1]
-        cc_not_assigned_mean_rank += cc[i][1]
-        dd_new_assigned_mean += dd[i][2]
-        gm_new_assigned_mean += gm[i][2]
-        gmp_new_assigned_mean += gmp[i][2]
-        cc_new_assigned_mean += cc[i][2]
-        
-
-    print(dd_assigned_mean / 100 / 30, dd_not_assigned_mean_rank / 100, dd_new_assigned_mean / 100)
-    print(gm_assigned_mean / 100 / 30, gm_not_assigned_mean_rank / 100, gm_new_assigned_mean / 100)
-    print(gmp_assigned_mean / 100 / 30, gmp_not_assigned_mean_rank / 100, gmp_new_assigned_mean / 100)
-    print(cc_assigned_mean / 100 / 30, cc_not_assigned_mean_rank / 100, cc_new_assigned_mean / 100)
-
-
-gen_question_13()
-run_all()
-
-# for i in range(1, 5):
-#     patients, donors, cadavers, K, P = generate_data(6, 3)
-#     write_data(
-#         "dataset/small_number_{}".format(i), patients, donors, cadavers, K, P
-#     )
-
-# for i in range(1, 5):
-#     n, c, patients, donors, cadavers, K, P = read_data(
-#                 "dataset/question_13_number_{}".format(i)
-#             )
-#     U = list(range(n))
-#     assigned = cycles_and_chains_matching(n, K, P, U)
-#     print(assigned)
-
-n, c, patients, donors, cadavers, K, P = read_data(
-                "dataset/question_13_number_{}".format(72)
             )
-U = list(range(n))
-cycles_and_chains_matching(n, K, P, U)
+            U = list(range(30))
+
+            M = f(n, K, P, U)
+                
+            assigned = get_list_of_assigned_from_matching(M)
+            own_donor_count = own_donor(M)
+            not_assigned = get_not_assigned_from_assigned(assigned)
+            cadaver_assigned = assign_to_cadavers(not_assigned, cadavers, patients)
+            not_assigned = get_not_assigned_from_assigned(assigned + cadaver_assigned)
+            not_assigned_mean_rank = sum(not_assigned) / len(not_assigned) if len(not_assigned) != 0 else 30
+            not_assigned_min = min(not_assigned) if len(not_assigned) != 0 else 30
+
+            total_assigned = len(assigned) + len(cadaver_assigned)
+            n_assigned = len(assigned)
+            n_cadaver_assigned = len(cadaver_assigned)
+
+            data.append([total_assigned, n_assigned, n_cadaver_assigned, own_donor_count, not_assigned_mean_rank, not_assigned_min])
+
+        s = ""
+        s2 = ""
+        for i in range(len(data[0])):
+            total = 0
+            for j in range(len(data)):
+                total += data[j][i]
+            s += str(total / len(data)) + " "
+            s2 += str(total / len(data) / 30) + " "
+
+        print(s)
+        print(s2)
+
+get_stats()

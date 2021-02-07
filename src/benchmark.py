@@ -30,5 +30,3 @@ def time_for_ilp(number=10):
         )
     for s in res:
         print(s)
-
-time_for_ilp()

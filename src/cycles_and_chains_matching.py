@@ -46,7 +46,7 @@ class Node:
 
 class Graph:
     
-    def __init__(self, n, K, P, U):
+    def __init__(self, n, K, P, U, is_matched=None):
         self.n = n
         self.K = K
         self.P = P
@@ -57,6 +57,9 @@ class Graph:
         self.nodes = []
         for id in range(n):
             self.nodes.append(Node(id, n, K[id], P[id]))
+            if is_matched is not None and is_matched[id]:
+                self.removed.add(self.nodes[id])
+                
         self.pos_in_U = [-1 for i in range(n)]
         for i, u in enumerate(U):
             self.pos_in_U[u] = i
@@ -65,7 +68,7 @@ class Graph:
         for node in self.nodes:
             node.previous = []
         for node in self.nodes:
-            if node.next != self.n:
+            if node.next != None and node.next != self.n:
                 node.next.previous.append(node)
 
     def update(self):
@@ -196,7 +199,7 @@ class Graph:
 
 def cycles_and_chains_matching(n, K, P, U, is_matched=None):
 
-    g = Graph(n, K, P, U)
+    g = Graph(n, K, P, U, is_matched=is_matched)
     g.update()
     # i = 0
     while not g.is_every_nodes_assigned():
@@ -211,5 +214,4 @@ def cycles_and_chains_matching(n, K, P, U, is_matched=None):
             chain = g.select_chain_A()
             # print(chain)
             g.assign_chain(chain)
-    g.select_chain_A()
     return g.get_assignement()

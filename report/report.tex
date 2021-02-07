@@ -26,6 +26,12 @@
 \usepackage{subcaption}
 \usepackage{lipsum}
 
+\usepackage{adjustbox}
+
+\usepackage{array}
+\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+
+
 \newcommand{\ruleB}{
     \begin{tikzpicture}[scale=5]
 
@@ -685,7 +691,7 @@ The final matching is:
 \newpage 
 \subsection*{Question 6}
 
-If the selection rule keep in the procedure any selected $w$-chain at a non-terminal round, then every unasigned kidney is available at every round of the procedure. Therefore, at every round of the algorithm, a patient can only be assigned to his best choice among remaining kidneys. The only way to give him a better kidney is to take it back from a patient whose assignement occurs in a previous round. Since this patient had his best choice at the time, he will strictly disprefer the new matching. Thus, the exchange mechanism is efficient.
+If the selection rule keep in the procedure any selected $w$-chain at a non-terminal round, then every unassigned kidney is available at every round of the procedure. Therefore, at every round of the algorithm, a patient can only be assigned to his best choice among remaining kidneys. The only way to give him a better kidney is to take it back from a patient whose assignement occurs in a previous round. Since this patient had his best choice at the time, he will strictly disprefer the new matching. Thus, the exchange mechanism is efficient.
 
 \subsection*{Question 7}
 
@@ -877,5 +883,35 @@ The results of the previous algorithm are available in the following figure. Not
 \end{figure}
 
 \subsection*{Question 13}
+
+We have run the direct donation, greedy matching and cycles and chains algorithms on the generated data, as well as the greedy matching and cycles and chains algorithms with direct donation as a preprocessing step. Some statistics on the results are available in Figure \ref{simul}.
+
+The algorithm allowing the most transplants is unsurprisingly cycles and chains, with 92.33\% of patients transplanted. The greedy matching algorithm is also quite efficient, with 86.9\% of operations, while the direct donation algorithm only allows 73.6\% of patients to be transplanted. Running the direct donation algorithm as a preprocessing step strictly decreases the performance of both the greedy matching and the cycle and chains algorithm. This is not surprising since running the direct donation algorithm reduces the possibilities of beneficial exchange, which is the basis of the other two algorithms. Especially since in the two other algorithms, a patient who is assigned to a donor in the direct donation will necessarily be assigned to a donor.
+
+If the cycles and chains algorithm is much more efficient with regard to the number of transplants than greedy matching, it should however be noted that the rank of the first unassigned patient is on average significantly worse. Thus, if the priority list of patients is especially important, greedy matching might reasonably be preferred.
+
+\begin{figure}[ht]
+
+    \centering
+    \begin{adjustbox}{width=\textwidth}
+    \begin{tabular}{|x{0.15\textwidth}|x{0.17\textwidth}|x{0.17\textwidth}|x{0.17\textwidth}|x{0.17\textwidth}|x{0.17\textwidth}|}
+        \hline
+        \textbf{algorithm} & \textbf{transplants} & \textbf{cadaver transplants} & \textbf{own donor transplants} & \textbf{rank first unassigned} & \textbf{mean rank unassigned} \\
+        \hline
+        direct donation & 22.08 \par (73.60 \%) & 2.59 \par (8.63 \%) & 19.49 \par (64.97 \%) & 5.25 & 16.18 \\
+        \hline
+        greedy matching & 26.07 \par (86.90 \%) & 2.15 \par (7.17 \%) & 5.64 \par (18.80 \%) & 12.64 & 19.63 \\
+        \hline
+        greedy matching preprocess & 23.09 \par (76.97 \%) & 2.3 \par (7.67 \%) & 19.49 \par (64.97 \%) & 5.82 & 16.35 \\
+        \hline
+        cycles and chains & 27.7 \par (92.33 \%) & 2.79 \par (9.30 \%) & 3.09 \par (10.30 \%) & 11.44 & 18.07 \\
+        \hline
+        cycles and chains preprocess & 24.69 \par (82.30 \%) & 2.41 \par (8.03 \%) & 19.49 \par (64.97 \%) & 7.21 & 17.58 \\
+        \hline
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Results of simulations on 100 randomly generated datasets ($n=30$, $c=3$).}
+    \label{simul}
+\end{figure}
 
 \end{document}
